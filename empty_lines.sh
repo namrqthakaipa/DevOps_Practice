@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Write a script to delete empty lines from a file
 
 if [ "$#" -ne 1 ]; then
     echo "Provide the file name"
