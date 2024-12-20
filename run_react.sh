@@ -37,3 +37,4 @@ sudo chmod -R 755 $DEST_DIR
 echo "Restarting Nginx web server"
 sudo systemctl restart nginx
 echo "Deployment complete!"
+npm start
