@@ -64,27 +64,15 @@ if [ ! -f "$NGINX_CONF" ]; then
     echo "Creating Nginx configuration file..."
     sudo bash -c "cat > $NGINX_CONF" <<EOL
 server {
-    listen 80;
-    server_name localhost;
+    server_name react.namkaipa.site;
 
     root $DEST_DIR;
     index index.html;
 
     location / {
-        try_files \$uri /index.html;
+        try_files \$uri \$uri/ =404;
     }
-
-    error_page 404 /index.html;
-
-    location ~* \.(?:manifest|json|xml|webmanifest)$ {
-        expires 1y;
-        access_log off;
-    }
-
-    location ~ \.js$ {
-        expires 6M;
-        access_log off;
-    }
+}
 }
 EOL
 
