@@ -72,8 +72,13 @@ server {
         try_files \$uri \$uri/ =404;
     }
 }
-}
+
 EOL
+    # Remove the existing symbolic link if it exists
+    if [ -L "$NGINX_LINK" ]; then
+    echo "Removing existing symbolic link for Nginx configuration..."
+    sudo rm "$NGINX_LINK"
+    fi
 
     # Create a soft link in /etc/nginx/sites-enabled
     echo "Creating symbolic link for Nginx configuration..."
