@@ -60,7 +60,6 @@ sudo chown -R www-data:www-data $DEST_DIR
 sudo chmod -R 755 $DEST_DIR
 
 # Step 10: Create an Nginx configuration file for the React app
-if [ ! -f "$NGINX_CONF" ]; then
     echo "Creating Nginx configuration file..."
     sudo bash -c "cat > $NGINX_CONF" <<EOL
 server {
@@ -79,9 +78,7 @@ EOL
     # Create a soft link in /etc/nginx/sites-enabled
     echo "Creating symbolic link for Nginx configuration..."
     sudo ln -s $NGINX_CONF $NGINX_LINK
-else
-    echo "Nginx configuration file already exists."
-fi
+
 
 # Step 11: Test and reload Nginx configuration
 echo "Testing Nginx configuration..."
