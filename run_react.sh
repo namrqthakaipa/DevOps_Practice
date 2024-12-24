@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Define variables
-REPO_URL="https://github.com/your-username/angular_deploy.git"  # Replace with your GitHub repository URL
-DEST_DIR="/var/www/html/angular"
-APP_NAME="angular_deploy"  # Replace with your desired app name
-NGINX_CONF="/etc/nginx/sites-available/angular"
-NGINX_LINK="/etc/nginx/sites-enabled/angular"
-DOMAIN_NAME="angular.namkaipa.site"  # Replace with your desired domain name
+REPO_URL="https://github.com/namrqthakaipa/react_deploy.git"  # Replace with your GitHub repository URL
+DEST_DIR="/var/www/html/react"
+APP_NAME="react_deploy"  # Replace with your desired app name
+NGINX_CONF="/etc/nginx/sites-available/react"
+NGINX_LINK="/etc/nginx/sites-enabled/react"
 
 # Step 1: Check if Nginx is installed, and install it if not
 if ! command -v nginx &> /dev/null; then
@@ -23,9 +22,9 @@ echo "Starting and enabling Nginx..."
 sudo systemctl start nginx
 sudo systemctl enable nginx
 
-# Step 3: Clone the Angular project from GitHub (if not already cloned)
+# Step 3: Clone the React project from GitHub (if not already cloned)
 if [ ! -d "$APP_NAME" ]; then 
-    echo "Cloning Angular project from GitHub..."
+    echo "Cloning React project from GitHub..."                                                                                                 
     git clone $REPO_URL $APP_NAME
 else
     echo "Repository already cloned. Pulling latest changes..."
@@ -41,9 +40,9 @@ cd $APP_NAME
 echo "Installing dependencies..."
 npm install
 
-# Step 6: Build the Angular application
-echo "Building the Angular application..."
-npm run build -- --prod
+# Step 6: Build the React application
+echo "Building the React application..."
+npm run build
 
 # Step 7: Create the target directory if it doesn't exist
 if [ ! -d "$DEST_DIR" ]; then
@@ -51,28 +50,40 @@ if [ ! -d "$DEST_DIR" ]; then
     sudo mkdir -p $DEST_DIR
 fi
 
-# Step 8: Deploy the build folder to /var/www/html/angular
+# Step 8: Deploy the build folder to /var/www/html/react
 echo "Deploying build folder to $DEST_DIR..."
 sudo rm -rf $DEST_DIR/*  # Remove any existing content in the destination folder
-sudo cp -r dist/* $DEST_DIR
+sudo cp -r build/* $DEST_DIR
 
 # Step 9: Set permissions for the deployed files
 sudo chown -R www-data:www-data $DEST_DIR
 sudo chmod -R 755 $DEST_DIR
 
-# Step 10: Create an Nginx configuration file for the Angular app
+# Step 10: Create an Nginx configuration file for the React app
 if [ ! -f "$NGINX_CONF" ]; then
     echo "Creating Nginx configuration file..."
     sudo bash -c "cat > $NGINX_CONF" <<EOL
 server {
     listen 80;
-    server_name $DOMAIN_NAME;
+    server_name localhost;
 
     root $DEST_DIR;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files \$uri /index.html;
+    }
+
+    error_page 404 /index.html;
+
+    location ~* \.(?:manifest|json|xml|webmanifest)$ {
+        expires 1y;
+        access_log off;
+    }
+
+    location ~ \.js$ {
+        expires 6M;
+        access_log off;
     }
 }
 EOL
@@ -95,10 +106,6 @@ else
     exit 1
 fi
 
-# Step 12: Update hosts file for local testing (optional)
-if ! grep -q "$DOMAIN_NAME" /etc/hosts; then
-    echo "Updating /etc/hosts for local testing..."
-    echo "127.0.0.1 $DOMAIN_NAME" | sudo tee -a /etc/hosts
-fi
+# Step 12: Run React app locally (for development purposes, if needed)
 
 echo "Deployment complete!"
